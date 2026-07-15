@@ -402,28 +402,201 @@
 
     <script>
         // GIF-анимации упражнений (встроенные ссылки)
+        const exerciseGifs = {<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Тренировки">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <link rel="apple-touch-icon" href="icon-180.png">
+    <link rel="manifest" href="manifest.json">
+    <title>Мои тренировки</title>
+    <style>
+        /* ... весь CSS без изменений ... */
+        :root {
+            --bg: #0f0f13;
+            --card: #1a1a24;
+            --card-hover: #22222e;
+            --text: #f0f0f0;
+            --text2: #a0a0b0;
+            --accent: #ff8c42;
+            --accent-light: #ffaa70;
+            --green: #4ade80;
+            --red: #f87171;
+            --border: #2a2a38;
+            --radius: 18px;
+            --radius-sm: 12px;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: 'SF Pro Display', 'Segoe UI', system-ui, sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding:0 20px 20px; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+        .container { max-width:700px; margin:0 auto; padding-top:60px; position:relative; }
+        .header { text-align:center; margin-bottom:24px; }
+        .header h1 { font-size:2rem; font-weight:800; background:linear-gradient(135deg,var(--accent),#ff5e62); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; display:inline-flex; align-items:center; gap:8px; }
+        .back-btn { position:fixed; top:max(20px, env(safe-area-inset-top) + 8px); left:20px; width:44px; height:44px; border-radius:50%; background:rgba(26,26,36,0.85); backdrop-filter:blur(12px); border:1px solid var(--border); color:var(--text); display:none; align-items:center; justify-content:center; font-size:1.4rem; cursor:pointer; z-index:30; }
+        .back-btn.visible { display:flex; }
+        .workout-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:12px; overflow:hidden; }
+        .workout-header { padding:18px 20px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; user-select:none; }
+        .workout-header:hover { background:var(--card-hover); }
+        .workout-type { font-weight:700; font-size:1.1rem; display:flex; align-items:center; gap:8px; }
+        .workout-date { font-size:0.85rem; color:var(--text2); }
+        .duration-badge { background:rgba(255,255,255,0.06); border-radius:20px; padding:4px 10px; font-size:0.8rem; color:var(--accent-light); display:flex; align-items:center; gap:4px; }
+        .workout-body { max-height:0; overflow:hidden; transition:max-height 0.4s ease, padding 0.3s ease; }
+        .workout-card.open .workout-body { max-height:5000px; padding:0 20px 20px; }
+        .timer-block { background:linear-gradient(135deg,#2a2a38,#1f1f2b); border-radius:var(--radius-sm); padding:14px 18px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+        .timer-display { font-size:2.2rem; font-weight:800; letter-spacing:2px; color:var(--accent-light); }
+        .timer-controls { display:flex; gap:8px; }
+        .timer-btn { background:rgba(255,255,255,0.08); border:none; color:var(--text); width:40px; height:40px; border-radius:50%; font-size:1.2rem; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+        .timer-btn.primary { background:var(--accent); color:#000; width:48px; height:48px; font-size:1.4rem; box-shadow:0 4px 12px rgba(255,140,66,0.4); }
+        .exercise { background:rgba(255,255,255,0.03); border-radius:var(--radius-sm); padding:14px; margin-bottom:10px; }
+        .exercise-name { font-weight:700; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; }
+        .exercise-gif { width:100%; border-radius:8px; margin:8px 0; max-height:200px; object-fit:cover; }
+        .planned { font-size:0.8rem; color:var(--text2); font-weight:400; }
+        .set-row { display:flex; gap:6px; margin:6px 0; align-items:center; flex-wrap:wrap; }
+        .set-row input { background:var(--border); border:none; color:var(--text); padding:8px 10px; border-radius:8px; font-size:0.9rem; width:70px; font-family:inherit; text-align:center; }
+        .set-timer-btn { background:var(--accent); color:#000; border:none; padding:6px 12px; border-radius:20px; font-size:0.75rem; cursor:pointer; font-weight:700; }
+        .set-timer-display { font-size:0.85rem; color:var(--accent-light); margin-left:8px; font-weight:700; }
+        .add-set-btn { background:transparent; border:1px dashed var(--border); color:var(--text2); padding:6px 12px; border-radius:20px; font-size:0.8rem; cursor:pointer; margin-top:6px; }
+        .btn { padding:10px 20px; border-radius:30px; border:none; font-weight:700; cursor:pointer; font-family:inherit; }
+        .btn-outline { background:transparent; border:2px solid var(--border); color:var(--text); }
+        .btn-accent { background:var(--accent); color:#000; font-weight:700; box-shadow:0 4px 12px rgba(255,140,66,0.3); }
+        .btn-sm { padding:6px 14px; font-size:0.8rem; }
+        .workout-comment textarea { width:100%; background:var(--border); border:none; color:var(--text); padding:12px; border-radius:var(--radius-sm); font-family:inherit; font-size:0.9rem; resize:vertical; }
+        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; z-index:50; }
+        .modal { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:28px 24px; max-width:360px; width:90%; text-align:center; }
+        .type-btn { background:var(--border); border:2px solid transparent; color:var(--text); padding:14px; border-radius:var(--radius-sm); font-weight:700; cursor:pointer; margin:5px 0; width:100%; }
+        .type-btn.selected { border-color:var(--accent); background:rgba(255,140,66,0.15); color:var(--accent); }
+        .report-card { background:var(--card); border:2px solid var(--accent); border-radius:var(--radius); padding:20px; margin:16px 0; text-align:center; }
+        .splash { position:fixed; top:0; left:0; width:100%; height:100%; background:#0f0f13; display:flex; align-items:center; justify-content:center; z-index:999; flex-direction:column; transition:opacity 0.6s ease, visibility 0.6s ease; }
+        .splash.hide { opacity:0; visibility:hidden; }
+        .lifter { font-size:5rem; animation:squat 0.8s ease-in-out infinite; }
+        @keyframes squat { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-12px); } }
+        @keyframes fadeSlide { from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:translateY(0); } }
+        .fade-slide { animation:fadeSlide 0.4s ease; }
+    </style>
+</head>
+<body>
+    <!-- Splash screen -->
+    <div class="splash" id="splashScreen"><div class="lifter">🏋️</div><div style="color:var(--accent-light);margin-top:20px;font-weight:700;">Загрузка...</div></div>
+
+    <div class="container" id="appContainer">
+        <div class="header"><h1>🏋️ Мои тренировки</h1></div>
+        <button class="back-btn" id="backButton" onclick="goBackToList()">←</button>
+        <div id="workoutList"></div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:16px;">
+            <button class="btn btn-outline" onclick="openNewWorkoutModal()">+ Новая тренировка</button>
+            <button class="btn btn-accent" onclick="exportAllPDF()">📄 Экспорт PDF</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно новой тренировки -->
+    <div id="newWorkoutModal" class="modal-overlay" style="display:none;">
+        <div class="modal">
+            <h3>Новая тренировка</h3>
+            <div id="typeOptions">
+                <button class="type-btn" data-type="Верх (силовой)">💪 Верх (силовой)</button>
+                <button class="type-btn" data-type="Низ">🦵 Низ</button>
+                <button class="type-btn" data-type="Объемный верх">🏋️ Объемный верх</button>
+            </div>
+            <input type="date" id="newWorkoutDate" style="margin:16px 0;background:var(--border);border:none;color:var(--text);padding:12px;border-radius:8px;width:100%;text-align:center;font-family:inherit;">
+            <div style="display:flex;gap:10px;justify-content:center;">
+                <button class="btn btn-outline btn-sm" onclick="closeModal()">Отмена</button>
+                <button class="btn btn-sm" style="background:var(--accent);color:#000;" id="createWorkoutBtn">Создать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Отчёт о завершении -->
+    <div id="reportModal" class="modal-overlay" style="display:none;">
+        <div class="modal" style="max-width:400px;" id="reportContent"></div>
+    </div>
+
+    <script>
+        // ========== НОВЫЕ GIF-АНИМАЦИИ (fitnessprogramer.com) ==========
         const exerciseGifs = {
-            'Жим штанги лежа': 'https://www.icegif.com/wp-content/uploads/2023/05/icegif-47.gif',
-            'Тяга верхнего блока': 'https://www.icegif.com/wp-content/uploads/2023/05/icegif-48.gif',
-            'Жим гантелей под наклоном': 'https://www.icegif.com/wp-content/uploads/2023/05/icegif-49.gif',
-            'Тяга сидя к поясу': 'https://www.icegif.com/wp-content/uploads/2023/05/icegif-50.gif',
-            'Face Pull': 'https://www.icegif.com/wp-content/uploads/2023/05/icegif-51.gif',
-            'Подъем штанги на бицепс': 'https://www.icegif.com/wp-content/uploads/2023/05/icegif-52.gif',
-            'Разгибание рук на блоке': 'https://www.icegif.com/wp-content/uploads/2023/05/icegif-53.gif',
-            'Жим ногами': 'https://www.icegif.com/wp-content/uploads/2023/05/icegif-54.gif',
-            'Болгарские приседы': 'https://www.icegif.com/wp-content/uploads/2023/05/icegif-55.gif',
-            'Румынская тяга': 'https://www.icegif.com/wp-content/uploads/2023/05/icegif-56.gif',
-            'Разгибание ног': 'https://www.icegif.com/wp-content/uploads/2023/05/icegif-57.gif',
-            'Ягодичный мост': 'https://www.icegif.com/wp-content/uploads/2023/05/icegif-58.gif',
-            'Dead Bug': 'https://www.icegif.com/wp-content/uploads/2023/05/icegif-59.gif',
-            'Боковая планка': 'https://www.icegif.com/wp-content/uploads/2023/05/icegif-60.gif',
-            'Тяга гантели одной рукой': 'https://www.icegif.com/wp-content/uploads/2023/05/icegif-61.gif',
-            'Верхний блок узким хватом': 'https://www.icegif.com/wp-content/uploads/2023/05/icegif-62.gif',
-            'Обратная бабочка': 'https://www.icegif.com/wp-content/uploads/2023/05/icegif-63.gif',
-            'Подъем гантелей на наклонной': 'https://www.icegif.com/wp-content/uploads/2023/05/icegif-64.gif',
-            'Молотки': 'https://www.icegif.com/wp-content/uploads/2023/05/icegif-65.gif',
-            'Подъемы в стороны': 'https://www.icegif.com/wp-content/uploads/2023/05/icegif-66.gif'
+            'Жим штанги лежа': 'https://fitnessprogramer.com/wp-content/uploads/2015/05/Barbell-Bench-Press.gif',
+            'Жим штанги лежа (без макс.)': 'https://fitnessprogramer.com/wp-content/uploads/2015/05/Barbell-Bench-Press.gif',
+            'Тяга верхнего блока': 'https://fitnessprogramer.com/wp-content/uploads/2015/05/Lat-Pulldown.gif',
+            'Жим гантелей под наклоном': 'https://fitnessprogramer.com/wp-content/uploads/2015/05/Incline-Dumbbell-Press.gif',
+            'Тяга сидя к поясу': 'https://fitnessprogramer.com/wp-content/uploads/2015/05/Seated-Cable-Row.gif',
+            'Face Pull': 'https://fitnessprogramer.com/wp-content/uploads/2015/05/Face-Pull.gif',
+            'Подъем штанги на бицепс': 'https://fitnessprogramer.com/wp-content/uploads/2015/05/Barbell-Curl.gif',
+            'Разгибание рук на блоке': 'https://fitnessprogramer.com/wp-content/uploads/2015/05/Tricep-Pushdown.gif',
+            'Жим ногами': 'https://fitnessprogramer.com/wp-content/uploads/2015/05/Leg-Press.gif',
+            'Болгарские приседы': 'https://fitnessprogramer.com/wp-content/uploads/2015/05/Bulgarian-Split-Squat.gif',
+            'Румынская тяга': 'https://fitnessprogramer.com/wp-content/uploads/2015/05/Romanian-Deadlift.gif',
+            'Разгибание ног': 'https://fitnessprogramer.com/wp-content/uploads/2015/05/Leg-Extension.gif',
+            'Ягодичный мост': 'https://fitnessprogramer.com/wp-content/uploads/2015/05/Glute-Bridge.gif',
+            'Dead Bug': 'https://fitnessprogramer.com/wp-content/uploads/2015/05/Dead-Bug.gif',
+            'Боковая планка': 'https://fitnessprogramer.com/wp-content/uploads/2015/05/Side-Plank.gif',
+            'Тяга гантели одной рукой': 'https://fitnessprogramer.com/wp-content/uploads/2015/05/One-Arm-Dumbbell-Row.gif',
+            'Верхний блок узким хватом': 'https://fitnessprogramer.com/wp-content/uploads/2015/05/Close-Grip-Lat-Pulldown.gif',
+            'Обратная бабочка': 'https://fitnessprogramer.com/wp-content/uploads/2015/05/Reverse-Fly.gif',
+            'Подъем гантелей на наклонной': 'https://fitnessprogramer.com/wp-content/uploads/2015/05/Incline-Dumbbell-Curl.gif',
+            'Молотки': 'https://fitnessprogramer.com/wp-content/uploads/2015/05/Hammer-Curl.gif',
+            'Подъемы в стороны': 'https://fitnessprogramer.com/wp-content/uploads/2015/05/Lateral-Raise.gif'
         };
+
+        // Шаблоны тренировок остаются те же...
+        const workoutTemplates = {
+            'Верх (силовой)': [
+                { name: 'Жим штанги лежа', sets: 4, reps: '5–6', weights: ['90', '95', '100', '90'] },
+                { name: 'Тяга верхнего блока', sets: 4, reps: '8–10', weights: ['70', '70', '75', '75'] },
+                { name: 'Жим гантелей под наклоном', sets: 3, reps: '8–10', weights: ['30', '32', '35'] },
+                { name: 'Тяга сидя к поясу', sets: 3, reps: '10', weights: ['50', '55', '55'] },
+                { name: 'Face Pull', sets: 3, reps: '15', weights: ['27', '30', '27.5'] },
+                { name: 'Подъем штанги на бицепс', sets: 3, reps: '6–8', weights: ['32.5', '32.5', '32.5'] },
+                { name: 'Разгибание рук на блоке', sets: 3, reps: '10–12', weights: ['30', '35', '35'] }
+            ],
+            'Низ': [
+                { name: 'Жим ногами', sets: 4, reps: '10', weights: ['120', '150', '170', '170'] },
+                { name: 'Болгарские приседы', sets: 3, reps: '10', weights: ['12', '12', '12'] },
+                { name: 'Румынская тяга', sets: 3, reps: '10', weights: ['20', '20', '22'] },
+                { name: 'Разгибание ног', sets: 3, reps: '12', weights: ['50', '55', '55'] },
+                { name: 'Ягодичный мост', sets: 3, reps: '12', weights: ['40', '40', '40'] },
+                { name: 'Dead Bug', sets: 3, reps: '12', weights: ['—', '—', '—'] },
+                { name: 'Боковая планка', sets: 3, reps: '30–40 сек', weights: ['—', '—', '—'] }
+            ],
+            'Объемный верх': [
+                { name: 'Жим штанги лежа (без макс.)', sets: 4, reps: '8–10', weights: ['80', '85', '85', '80'] },
+                { name: 'Тяга гантели одной рукой', sets: 3, reps: '10', weights: ['28', '30', '34'] },
+                { name: 'Верхний блок узким хватом', sets: 3, reps: '10–12', weights: ['70', '70', '60'] },
+                { name: 'Обратная бабочка', sets: 3, reps: '15', weights: ['?', '?', '?'] },
+                { name: 'Подъем гантелей на наклонной', sets: 3, reps: '8–10', weights: ['12', '14', '14'] },
+                { name: 'Молотки', sets: 3, reps: '10–12', weights: ['14', '14', '14'] },
+                { name: 'Подъемы в стороны', sets: 3, reps: '12–15', weights: ['8', '10', '10'] }
+            ]
+        };
+
+        // ... остальной JavaScript без изменений (весь функционал таймеров, отчётов, PDF) ...
+        const LS_KEY = 'my_workouts_v1';
+        let workouts = JSON.parse(localStorage.getItem(LS_KEY)) || [];
+        const activeTimers = {};
+        const setTimers = {};
+        let currentOpenId = null;
+        let selectedType = null;
+
+        if (workouts.length === 0) {
+            workouts.push(createNewWorkout('Верх (силовой)', new Date().toISOString().slice(0, 10)));
+            save();
+        }
+
+        function createNewWorkout(type, date) { /* ... */ }
+        function save() { /* ... */ }
+        // ... (весь JavaScript код, который был в предыдущем полном ответе, оставлен без изменений, 
+        // только добавлено onerror для картинок в render)
+        function render() {
+            // ... при генерации exercise gif добавим onerror
+            const gifUrl = exerciseGifs[ex.name] || '';
+            const gifTag = gifUrl ? `<img src="${gifUrl}" class="exercise-gif" alt="${ex.name}" loading="lazy" onerror="this.style.display='none'">` : '';
+            // ... остальной рендер
+        }
+        // ... все функции (startTimer, pauseTimer, finishWorkout, exportAllPDF и т.д.)
+        // Я не дублирую их здесь, чтобы не загромождать ответ – они точно такие же, как в предыдущей версии.
+    </script>
+</body>
+</html>
 
         const workoutTemplates = {
             'Верх (силовой)': [
