@@ -15,7 +15,7 @@
             --radius-sm: 14px;
             --green: #34c759;
             --red: #ff453a;
-            --transition: 0.25s cubic-bezier(0.2, 0.9, 0.4, 1);
+            --transition: 0.2s cubic-bezier(0.2, 0.9, 0.4, 1);
             --c-mint: #def4e4;
             --c-cream: #f4f4bd;
             --c-peach: #f4d4bd;
@@ -23,21 +23,23 @@
             --c-deepblue: #3e6787;
         }
 
+        /* Тёмная тема — титаново-серебристая с тёмно-голубым */
         [data-theme="dark"] {
-            --bg: #1a2f3f;
-            --glass-bg: rgba(30, 50, 65, 0.75);
-            --glass-border: rgba(180, 139, 139, 0.25);
+            --bg: #1a1e26;
+            --glass-bg: rgba(36, 40, 50, 0.8);
+            --glass-border: rgba(180, 180, 200, 0.2);
             --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-            --text: #f4f4bd;
-            --text2: #b48b8b;
-            --accent: #f4d4bd;
-            --accent-light: #f4e4d4;
-            --input-bg: rgba(244, 212, 189, 0.08);
-            --input-border: rgba(180, 139, 139, 0.3);
-            --hover-bg: rgba(244, 212, 189, 0.06);
-            --active-bg: rgba(244, 212, 189, 0.12);
+            --text: #e4e4ec;
+            --text2: #9a9aa8;
+            --accent: #5b8abf;
+            --accent-light: #7aa9d9;
+            --input-bg: rgba(255, 255, 255, 0.06);
+            --input-border: rgba(255, 255, 255, 0.1);
+            --hover-bg: rgba(255, 255, 255, 0.04);
+            --active-bg: rgba(255, 255, 255, 0.1);
         }
 
+        /* Светлая тема */
         [data-theme="light"] {
             --bg: #def4e4;
             --glass-bg: rgba(244, 244, 189, 0.75);
@@ -83,10 +85,26 @@
             border: 1px solid var(--glass-border); border-radius: 30px;
             padding: 8px 16px; display: flex; align-items: center; gap: 8px;
             cursor: pointer; color: var(--text); font-weight: 600;
-            box-shadow: var(--glass-shadow); transition: background 0.2s;
+            box-shadow: var(--glass-shadow); transition: background 0.2s, transform 0.1s;
+            position: relative; z-index: 2;
         }
-        .theme-toggle:active { transform: scale(0.96); }
+        .theme-toggle:active { transform: scale(0.95); background: var(--active-bg); }
         .theme-toggle svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+        /* Анимированная иконка смены темы */
+        .theme-fly-icon {
+            position: fixed;
+            z-index: 1000;
+            font-size: 2rem;
+            pointer-events: none;
+            transition: all 1s cubic-bezier(0.25, 0.1, 0.25, 1);
+            will-change: transform, opacity, left, top;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+        }
 
         .back-btn {
             position: fixed; top: max(24px, env(safe-area-inset-top) + 12px); left: 20px;
@@ -157,13 +175,14 @@
         .timer-display { font-size: 2rem; font-weight: 700; color: var(--accent); letter-spacing: 1px; font-variant-numeric: tabular-nums; }
         .timer-controls { display: flex; gap: 10px; }
         .timer-btn {
-            background: rgba(244, 212, 189, 0.1); border: none; color: var(--text);
+            background: rgba(255,255,255,0.08); border: none; color: var(--text);
             width: 38px; height: 38px; border-radius: 50%; font-size: 1.2rem; cursor: pointer;
             display: flex; align-items: center; justify-content: center; transition: 0.1s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-        .timer-btn:active { transform: scale(0.85); background: var(--active-bg); }
-        .timer-btn.primary { background: var(--accent); color: #fff; width: 44px; height: 44px; font-size: 1.3rem; box-shadow: 0 4px 14px rgba(180, 139, 139, 0.5); }
-        .timer-btn.primary:active { transform: scale(0.85); background: var(--accent-light); }
+        .timer-btn:active { transform: scale(0.85); background: var(--active-bg); box-shadow: 0 1px 2px rgba(0,0,0,0.3) inset; }
+        .timer-btn.primary { background: var(--accent); color: #fff; width: 44px; height: 44px; font-size: 1.3rem; box-shadow: 0 4px 14px rgba(0,0,0,0.3); }
+        .timer-btn.primary:active { transform: scale(0.85); background: var(--accent-light); box-shadow: 0 2px 8px rgba(0,0,0,0.4) inset; }
 
         .exercise { padding: 14px 0; border-bottom: 1px solid var(--glass-border); }
         .exercise-name { font-weight: 600; margin-bottom: 8px; display: flex; justify-content: space-between; }
@@ -182,27 +201,40 @@
             width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--glass-border);
             background: var(--input-bg); color: var(--text); font-size: 1rem; cursor: pointer;
             display: flex; align-items: center; justify-content: center; font-weight: bold; user-select: none;
+            transition: 0.1s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-        .reps-btn:active { background: var(--accent); color: #fff; transform: scale(0.9); }
+        .reps-btn:active { background: var(--accent); color: #fff; transform: scale(0.9); box-shadow: 0 1px 2px rgba(0,0,0,0.3) inset; }
         .reps-value { min-width: 36px; text-align: center; font-weight: 700; font-size: 1rem; }
 
         .add-set-btn {
             background: transparent; border: 1px dashed var(--glass-border); color: var(--text2);
             padding: 8px 14px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; margin-top: 8px;
+            transition: 0.1s;
         }
-        .add-set-btn:active { background: var(--active-bg); border-color: var(--accent); color: var(--accent); }
+        .add-set-btn:active { background: var(--active-bg); border-color: var(--accent); color: var(--accent); transform: scale(0.96); }
 
         .btn {
             padding: 12px 22px; border-radius: 30px; border: none; font-weight: 600;
-            cursor: pointer; font-family: inherit; transition: 0.2s; display: inline-flex;
+            cursor: pointer; font-family: inherit; transition: 0.15s; display: inline-flex;
             align-items: center; justify-content: center; gap: 6px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
-        .btn:active { transform: scale(0.94); filter: brightness(0.9); }
+        .btn:active { transform: scale(0.94); filter: brightness(0.9); box-shadow: 0 2px 4px rgba(0,0,0,0.3) inset; }
         .btn-outline { background: transparent; border: 1.5px solid var(--glass-border); color: var(--text); }
         .btn-outline:active { background: var(--active-bg); }
-        .btn-accent { background: var(--accent); color: #fff; box-shadow: 0 6px 18px rgba(180, 139, 139, 0.4); }
-        .btn-accent:active { background: var(--accent-light); }
+        .btn-accent { background: var(--accent); color: #fff; box-shadow: 0 6px 18px rgba(0,0,0,0.3); }
+        .btn-accent:active { background: var(--accent-light); box-shadow: 0 2px 8px rgba(0,0,0,0.4) inset; }
         .btn-sm { padding: 8px 16px; font-size: 0.8rem; border-radius: 20px; }
+
+        .btn-static {
+            transition: 0.15s; box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            background: var(--accent); color: #fff; border: none;
+            padding: 14px 24px; font-size: 1rem; border-radius: 30px;
+            display: inline-flex; align-items: center; gap: 8px;
+            font-weight: 700;
+        }
+        .btn-static:active { transform: scale(0.95); box-shadow: 0 3px 6px rgba(0,0,0,0.4) inset; }
 
         .workout-comment textarea {
             width: 100%; background: var(--input-bg); border: 1px solid var(--input-border);
@@ -221,15 +253,17 @@
             border: 1px solid var(--glass-border); border-radius: var(--radius);
             padding: 28px 24px; max-width: 400px; width: 90%; max-height: 80vh; overflow-y: auto;
             box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            margin: auto;
         }
-        .modal h3 { margin-bottom: 16px; font-weight: 700; }
+        .modal h3 { margin-bottom: 16px; font-weight: 700; text-align: center; }
         .type-btn {
             background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text);
             padding: 14px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer;
             margin: 6px 0; width: 100%; transition: 0.2s; display: flex; align-items: center; gap: 8px;
+            text-align: left;
         }
         .type-btn:active { transform: scale(0.96); background: var(--active-bg); }
-        .type-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; }
+        .type-btn svg { width: 24px; height: 24px; flex-shrink: 0; }
 
         .exercise-catalog-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
         .exercise-option {
@@ -271,30 +305,23 @@
     <div class="container" id="appContainer">
         <div class="header">
             <h1>
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="url(#grad)" stroke-width="2">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="url(#grad)" stroke-width="2">
                     <defs>
                         <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
                             <stop offset="0%" stop-color="var(--accent)" />
                             <stop offset="100%" stop-color="var(--c-deepblue)" />
                         </linearGradient>
                     </defs>
-                    <rect x="1" y="6" width="4" height="12" rx="1" />
-                    <rect x="19" y="6" width="4" height="12" rx="1" />
-                    <rect x="6" y="4" width="12" height="3" rx="1" />
-                    <line x1="8" y1="7" x2="16" y2="7" />
-                    <line x1="8" y1="10" x2="16" y2="10" />
-                    <line x1="8" y1="13" x2="16" y2="13" />
+                    <rect x="2" y="9" width="20" height="6" rx="2" />
+                    <circle cx="8" cy="12" r="3" />
+                    <circle cx="16" cy="12" r="3" />
                 </svg>
                 Мои тренировки
             </h1>
-            <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn">
-                <svg id="themeIconDark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="5" />
-                    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-                </svg>
-                <svg id="themeIconLight" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
-                    <path d="M21 12.79A9 9 0 1111.21 3.77 7 7 0 0021 12.79z" />
-                </svg>
+            <button class="theme-toggle" id="themeToggleBtn" onclick="toggleThemeWithAnimation()">
+                <span id="themeIconContainer">
+                    <!-- Иконка будет меняться через JS -->
+                </span>
                 Тема
             </button>
         </div>
@@ -322,7 +349,10 @@
         <div id="workoutList"></div>
         <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:16px;">
             <button type="button" class="btn btn-outline" onclick="openNewWorkoutModal()">+ Новая тренировка</button>
-            <button type="button" class="btn btn-accent" onclick="exportAllPDF()">📄 Экспорт PDF</button>
+            <button type="button" class="btn-static" onclick="exportAllPDF()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-6l-2 2H10l-2-2H2"/><path d="M2 12v8a2 2 0 002 2h16a2 2 0 002-2v-8"/></svg>
+                Отправить тренеру
+            </button>
         </div>
     </div>
 
@@ -331,23 +361,23 @@
         <div class="modal">
             <h3>Новая тренировка</h3>
             <button type="button" class="type-btn" onclick="chooseTemplate('Push')">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 8h10v8H7z"/><circle cx="12" cy="12" r="2"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4h12v4H6zM6 10h12v4H6z"/><path d="M10 14v6h4v-6"/><circle cx="12" cy="6" r="1"/></svg>
                 Push (Грудь/Плечи/Трицепс)
             </button>
             <button type="button" class="type-btn" onclick="chooseTemplate('Legs + Core')">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4h12v16H6z"/><line x1="10" y1="8" x2="14" y2="8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16"/><path d="M8 14v-6l2-2h4l2 2v6"/><circle cx="12" cy="8" r="2"/></svg>
                 Legs + Core
             </button>
             <button type="button" class="type-btn" onclick="chooseTemplate('Pull')">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 12h8M12 8v8"/><circle cx="12" cy="12" r="10"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/><circle cx="12" cy="12" r="2"/></svg>
                 Pull (Спина/Бицепс)
             </button>
             <button type="button" class="type-btn" onclick="chooseTemplate('Shoulders + Arms')">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="4"/><circle cx="16" cy="8" r="4"/><path d="M8 12h8v8H8z"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="6" r="3"/><circle cx="16" cy="6" r="3"/><path d="M8 9v6l4 4v-6l4-4v-6"/></svg>
                 Shoulders + Arms
             </button>
             <button type="button" class="type-btn" style="background: rgba(180,139,139,0.2); border-color: var(--accent);" onclick="openCustomWorkoutConstructor()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 5v4M12 15v4M5 12h4M15 12h4"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 5v4M12 15v4M5 12h4M15 12h4"/></svg>
                 Своя тренировка
             </button>
             <button type="button" class="btn btn-outline btn-sm" style="margin-top:14px; width:100%;" onclick="closeTypeSelection()">Отмена</button>
@@ -453,7 +483,6 @@
             const PROGRESS_KEY = 'my_progress_v1';
             let workouts = JSON.parse(localStorage.getItem(LS_KEY)) || [];
             let progressData = JSON.parse(localStorage.getItem(PROGRESS_KEY)) || {};
-            // Удаляем старые лишние ключи, если были
             const keepFields = ['benchPR','benchGoal','bicepPR','weight','waist','waistGoal'];
             Object.keys(progressData).forEach(k => { if (!keepFields.includes(k)) delete progressData[k]; });
             keepFields.forEach(k => { if (!(k in progressData)) progressData[k] = ''; });
@@ -472,34 +501,78 @@
             function formatTime(s) { const m = Math.floor(s/60), sec = s%60; return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; }
             function formatDate(d) { const [y,m,day] = d.split('-'); return `${day}.${m}.${y}`; }
             function playBeep() {
-                try {
-                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                    const osc = ctx.createOscillator();
-                    osc.type = 'sine'; osc.frequency.setValueAtTime(800, ctx.currentTime);
-                    osc.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.3);
-                } catch(e) {}
+                try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const osc = ctx.createOscillator(); osc.type = 'sine'; osc.frequency.setValueAtTime(800, ctx.currentTime); osc.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.3); } catch(e) {}
             }
 
-            // ========== ТЕМА ==========
-            function applyTheme(theme) {
+            // ========== ТЕМА С АНИМАЦИЕЙ ВЫЛЕТА ИКОНКИ ==========
+            function setTheme(theme) {
                 document.documentElement.setAttribute('data-theme', theme);
                 localStorage.setItem('athlete_theme', theme);
-                const darkIcon = document.getElementById('themeIconDark');
-                const lightIcon = document.getElementById('themeIconLight');
+                updateThemeIcon(theme);
+            }
+
+            function updateThemeIcon(theme) {
+                const iconContainer = document.getElementById('themeIconContainer');
                 if (theme === 'dark') {
-                    darkIcon.style.display = 'block';
-                    lightIcon.style.display = 'none';
+                    iconContainer.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`;
                 } else {
-                    darkIcon.style.display = 'none';
-                    lightIcon.style.display = 'block';
+                    iconContainer.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3.77 7 7 0 0021 12.79z"/></svg>`;
                 }
             }
-            window.toggleTheme = function() {
+
+            window.toggleThemeWithAnimation = function() {
                 const current = document.documentElement.getAttribute('data-theme');
-                applyTheme(current === 'dark' ? 'light' : 'dark');
+                const next = current === 'dark' ? 'light' : 'dark';
+                const toggleBtn = document.getElementById('themeToggleBtn');
+                const iconContainer = document.getElementById('themeIconContainer');
+                const btnRect = toggleBtn.getBoundingClientRect();
+
+                // Создаём летящую иконку
+                const flyIcon = document.createElement('div');
+                flyIcon.className = 'theme-fly-icon';
+                // Устанавливаем начальную позицию внутри кнопки
+                flyIcon.style.left = btnRect.left + btnRect.width/2 - 16 + 'px';
+                flyIcon.style.top = btnRect.top + btnRect.height/2 - 16 + 'px';
+                flyIcon.style.fontSize = '1.5rem';
+                flyIcon.style.opacity = '1';
+                flyIcon.style.transform = 'scale(1)';
+                flyIcon.textContent = current === 'dark' ? '☀️' : '🌙';
+                document.body.appendChild(flyIcon);
+
+                // Принудительный рефлоу
+                flyIcon.offsetWidth;
+
+                // Анимация полёта в центр экрана
+                requestAnimationFrame(() => {
+                    const centerX = window.innerWidth / 2 - 16;
+                    const centerY = window.innerHeight / 2 - 16;
+                    flyIcon.style.left = centerX + 'px';
+                    flyIcon.style.top = centerY + 'px';
+                    flyIcon.style.transform = 'scale(2.5)';
+                    flyIcon.style.opacity = '0.9';
+                });
+
+                // В середине анимации меняем иконку и переключаем тему
+                setTimeout(() => {
+                    flyIcon.textContent = next === 'dark' ? '🌙' : '☀️';
+                    setTheme(next);
+                }, 500);
+
+                // Завершаем анимацию
+                setTimeout(() => {
+                    flyIcon.style.opacity = '0';
+                    flyIcon.style.transform = 'scale(3)';
+                }, 800);
+
+                setTimeout(() => {
+                    flyIcon.remove();
+                }, 1200);
             };
+
+            // Инициализация темы
             const savedTheme = localStorage.getItem('athlete_theme') || 'dark';
-            applyTheme(savedTheme);
+            setTheme(savedTheme);
+            updateThemeIcon(savedTheme);
 
             // ========== ПРОГРЕСС ==========
             function loadProgressFields() {
